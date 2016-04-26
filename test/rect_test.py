@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 """
-Unit Test for Template
+Unit Tests for PyRectangle
 """
 # Author Information
 __author__ = "Christopher Aicher"
 
 # Import Modules
+from rect import PyRectangle
 import unittest
 
 
 # Tests
-class TestBasicMethods(unittest.TestCase):
+class TestPyRectangle(unittest.TestCase):
 
     def test_equal(self):
         self.assertEqual(1, 1)
@@ -23,7 +24,7 @@ class TestBasicMethods(unittest.TestCase):
 
 # Code to execute if called from command-line
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestBasicMethods)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestPyRectangle)
     unittest.TextTestRunner(verbosity=2).run(suite)
 
 # EOF

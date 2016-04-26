@@ -1,18 +1,19 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
+#from distutils.core import setup
+from Cython.Build import cythonize
+
+#setup(ext_modules = cythonize("rect/rect.pyx"))
 
 config = {
-    'name': 'TEMPLATE',  # Replace with project name
+    'name': 'CythonRectangles',  # Replace with project name
     'version': '0.0',  # Replace with module_name.__version__
     'url': '',  # Replace with url to github
     'description': 'This is a template',  # Replace with project description
     'author': 'Christopher Aicher',
     'license': 'license',
-    'packages': ['module_name'],  # Replace with package names
+    'packages': ['rect'],  # Replace with package names
+    'ext_modules': cythonize("rect/rect.pyx"), # Cythonized Packages
     'scripts': [], # Scripts with #!/usr/bin/env python
-
 }
 
 setup(**config)
