@@ -38,9 +38,33 @@ when in develop mode.
 
 
 ### Testing Python Library
-Run tests via `nosetests` from the terminals.
+Use Python's `unittest` module to write unit tests.
 Write tests in the `/test` directory.
+See `/test/rect_test.py` for more details.
 
+Run tests via `nosetests` from the terminal.
+
+### Profiling Python Library
+From within IPython, define a funcion `to_profile()` with the code of interest.
+Then consider running the magic `%prun` after importing the `cProfile` module
+```
+import cProfile
+%prun -D output_dump_location to_profile()
+```
+
+For visualization of `cProfile` output, use `kcachegrind` and `pyprof2calltree` from the terminal
+```
+$ pyprof2calltree -i output_dump_location -k
+```
+
+For line-by-line profiling and memory profiling, use the following two extensions to IPython
+```
+load_ext line_profiler
+load_ext memory_profiler
+```
+Then use the magic functions `%lprun` and `%mprun` on `to_profile()` within IPython.
+
+See http://scikit-learn.org/stable/developers/performance.html for more details.
 
 ### Using Cythonize to build python library from cpp files
 To build the cython extensions for this project, we use `setup.py` and call
