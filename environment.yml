@@ -12,6 +12,8 @@ dependencies:
 - wheel
 - zlib
 - numpy
+- scipy
 - pandas
+- matplotlib
 - nose
 - ipython
