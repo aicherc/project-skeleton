@@ -12,5 +12,6 @@ wheel
 zlib
 numpy
 pandas
+matplotlib
 nose
 ipython
