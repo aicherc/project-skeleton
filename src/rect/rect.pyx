@@ -1,8 +1,7 @@
 # distutils: language = c++
 # distutils: sources = cython/src/rectangle.cpp
 
-# ^ distutils lines are important
-
+# ^ distutils lines are important (do not delete)
 
 # Pythonic redefinition of rectangle class header for Cython
 cdef extern from "../cython/src/rectangle.h" namespace "shapes":
@@ -17,8 +16,8 @@ cdef extern from "../cython/src/rectangle.h" namespace "shapes":
         void move(int, int)
 
 # Definition of python class
-cdef class PyRectangle:
-    """ PyRectangle DocString
+cdef class CRectangle:
+    """ CRectangle DocString
 
     Attributes:
       x0 - (int)
@@ -26,7 +25,7 @@ cdef class PyRectangle:
       x1 - (int)
       y1 - (int)
 
-    Warning inappropriate types (e.g. doubles) are automatically converted to int.
+    Warning inappropriate types (e.g. doubles) are converted to int.
 
     """
     cdef Rectangle _rectangle
@@ -36,22 +35,22 @@ cdef class PyRectangle:
 
     @staticmethod
     cdef create(Rectangle r):
-        ret = PyRectangle()
+        ret = CRectangle()
         ret._rectangle = r
         return ret
 
     def __repr__(self):
-        """ String representation of PyRectangle """
-        rep = "PyRectangle: \n"
+        """ String representation of CRectangle """
+        rep = "CRectangle: \n"
         rep += "x0 = " + str(self._rectangle.x0) + "\n"
         rep += "y0 = " + str(self._rectangle.y0) + "\n"
         rep += "x1 = " + str(self._rectangle.x1) + "\n"
         rep += "y1 = " + str(self._rectangle.y1) + "\n"
         return rep
 
-    def __add__(PyRectangle left, PyRectangle right):
+    def __add__(CRectangle left, CRectangle right):
         """ Rectangle Addition """
-        answer = PyRectangle.create(left._rectangle + right._rectangle)
+        answer = CRectangle.create(left._rectangle + right._rectangle)
         return answer
 
     def getLength(self):

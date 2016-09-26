@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Unit Tests for PyRectangle
+Unit Tests for rect
 """
 # Author Information
 __author__ = "Christopher Aicher"
