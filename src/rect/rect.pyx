@@ -4,7 +4,7 @@
 # ^ distutils lines are important (do not delete)
 
 # Pythonic redefinition of rectangle class header for Cython
-cdef extern from "../cython/src/rectangle.h" namespace "shapes":
+cdef extern from "rectangle.h" namespace "shapes":
     cdef cppclass Rectangle:
         Rectangle() except+
         Rectangle(int, int, int, int) except+

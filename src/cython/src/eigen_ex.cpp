@@ -14,23 +14,23 @@ namespace eigen_ex {
 
   VectorXd multi_positive_definite_inverse(MatrixXd A, VectorXd x, int k){
     VectorXd b = x;
+    LDLT<MatrixXd> Ainv(A.rows());
+    Ainv.compute(A);
     for(int ii = 0; ii < k; ii++){
-      b = A.ldlt().solve(b);
+      b = Ainv.solve(b);
     }
     return b;
   }
 
   Vector4d multi_positive_definite_inverse_size_4(Matrix4d A, Vector4d x, int k){
     VectorXd b = x;
+    LDLT<MatrixXd> Ainv(A.rows());
+    Ainv.compute(A);
     for(int ii = 0; ii < k; ii++){
-      b = A.ldlt().solve(b);
+      b = Ainv.solve(b);
     }
     return b;
   }
-
-
-
-
 
 } // namespace eigen_ex
 
