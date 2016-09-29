@@ -15,7 +15,7 @@ extensions = [
         ]
 
 config = {
-    'name': 'CythonRectangles',  # Replace with project name
+    'name': 'ProjectSkeleton',  # Replace with project name
     'version': '0.0',  # Replace with module_name.__version__
     'url': '',  # Replace with url to github
     'description': 'This is a template',  # Replace with project description

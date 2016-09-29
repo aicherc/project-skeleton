@@ -22,7 +22,7 @@
             "cython/src/eigen_ex.cpp"
         ]
     }, 
-    "module_name": "eigen_example/eigen_example"
+    "module_name": "eigen_example.eigen_example"
 }
 END: Cython Metadata */
 
@@ -900,9 +900,27 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
     PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
     const char* function_name);
 
-/* ArgTypeTest.proto */
-static CYTHON_INLINE int __Pyx_ArgTypeTest(PyObject *obj, PyTypeObject *type, int none_allowed,
-    const char *name, int exact);
+/* GetItemInt.proto */
+#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
+               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
+#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
+                                                     int is_list, int wraparound, int boundscheck);
 
 /* PyObjectCall.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
@@ -948,6 +966,10 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject
 
 /* PyObjectCallOneArg.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+
+/* ArgTypeTest.proto */
+static CYTHON_INLINE int __Pyx_ArgTypeTest(PyObject *obj, PyTypeObject *type, int none_allowed,
+    const char *name, int exact);
 
 /* DictGetItem.proto */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
@@ -1004,6 +1026,9 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object);
 static void __Pyx_AddTraceback(const char *funcname, int c_line,
                                int py_line, const char *filename);
 
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
+
 /* CppExceptionConversion.proto */
 #ifndef __Pyx_CppExn2PyErr
 #include <new>
@@ -1043,6 +1068,9 @@ static void __Pyx_CppExn2PyErr() {
   }
 }
 #endif
+
+/* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
 
 /* None.proto */
 #if CYTHON_CCOMPLEX
@@ -1148,16 +1176,10 @@ static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(do
 #endif
 
 /* CIntToPy.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
-
-/* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum__NPY_TYPES(enum NPY_TYPES value);
 
 /* CIntFromPy.proto */
 static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
-
-/* CIntToPy.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
 
 /* CIntFromPy.proto */
 static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *);
@@ -1223,37 +1245,51 @@ int __pyx_module_is_main_eigen_example__eigen_example = 0;
 
 /* Implementation of 'eigen_example.eigen_example' */
 static PyObject *__pyx_builtin_ValueError;
+static PyObject *__pyx_builtin_TypeError;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
 static const char __pyx_k_A[] = "A";
 static const char __pyx_k_T[] = "T";
 static const char __pyx_k_b[] = "b";
+static const char __pyx_k_k[] = "k";
 static const char __pyx_k_x[] = "x";
 static const char __pyx_k_bT[] = "bT";
 static const char __pyx_k_np[] = "_np";
 static const char __pyx_k_any[] = "any";
 static const char __pyx_k_main[] = "__main__";
+static const char __pyx_k_ndim[] = "ndim";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_range[] = "range";
+static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_linalg[] = "linalg";
 static const char __pyx_k_eigvals[] = "eigvals";
+static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_ValueError[] = "ValueError";
+static const char __pyx_k_fixed_size[] = "fixed_size";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
+static const char __pyx_k_check_inputs[] = "_check_inputs";
+static const char __pyx_k_k_must_be_an_int[] = "k must be an int";
+static const char __pyx_k_c_crazy_operation[] = "c_crazy_operation";
 static const char __pyx_k_x_must_be_a_vector[] = "x must be a vector";
+static const char __pyx_k_k_must_be_nonnegative[] = "k must be nonnegative";
+static const char __pyx_k_c_crazy_operation_size_4[] = "c_crazy_operation_size_4";
 static const char __pyx_k_A_must_be_a_square_matrix[] = "A must be a square matrix";
 static const char __pyx_k_A_must_be_positive_definite[] = "A must be positive definite";
 static const char __pyx_k_c_positive_definite_inverse[] = "c_positive_definite_inverse";
 static const char __pyx_k_eigen_example_eigen_example[] = "eigen_example.eigen_example";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
+static const char __pyx_k_x_must_be_a_vector_of_size_4[] = "x must be a vector of size 4";
 static const char __pyx_k_A_and_x_are_incompatible_sizes[] = "A and x are incompatible sizes";
 static const char __pyx_k_home_aicherc_Projects_project_s[] = "/home/aicherc/Projects/project-skeleton/src/eigen_example/eigen_example.pyx";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
 static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte order not supported";
+static const char __pyx_k_c_multi_positive_definite_invers[] = "c_multi_positive_definite_inverse";
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
+static const char __pyx_k_c_multi_positive_definite_invers_2[] = "c_multi_positive_definite_inverse_size_4";
 static PyObject *__pyx_n_s_A;
 static PyObject *__pyx_kp_s_A_and_x_are_incompatible_sizes;
 static PyObject *__pyx_kp_s_A_must_be_a_square_matrix;
@@ -1263,30 +1299,51 @@ static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_kp_u_Non_native_byte_order_not_suppor;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_n_s_T;
+static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_any;
 static PyObject *__pyx_n_s_b;
 static PyObject *__pyx_n_s_bT;
+static PyObject *__pyx_n_s_c_crazy_operation;
+static PyObject *__pyx_n_s_c_crazy_operation_size_4;
+static PyObject *__pyx_n_s_c_multi_positive_definite_invers;
+static PyObject *__pyx_n_s_c_multi_positive_definite_invers_2;
 static PyObject *__pyx_n_s_c_positive_definite_inverse;
+static PyObject *__pyx_n_s_check_inputs;
 static PyObject *__pyx_n_s_eigen_example_eigen_example;
 static PyObject *__pyx_n_s_eigvals;
+static PyObject *__pyx_n_s_fixed_size;
 static PyObject *__pyx_kp_s_home_aicherc_Projects_project_s;
 static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_k;
+static PyObject *__pyx_kp_s_k_must_be_an_int;
+static PyObject *__pyx_kp_s_k_must_be_nonnegative;
 static PyObject *__pyx_n_s_linalg;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
+static PyObject *__pyx_n_s_ndim;
 static PyObject *__pyx_n_s_np;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_range;
+static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_kp_s_x_must_be_a_vector;
-static PyObject *__pyx_pf_13eigen_example_13eigen_example_c_positive_definite_inverse(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x); /* proto */
+static PyObject *__pyx_kp_s_x_must_be_a_vector_of_size_4;
+static PyObject *__pyx_pf_13eigen_example_13eigen_example__check_inputs(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_A, PyObject *__pyx_v_x, PyObject *__pyx_v_k, PyObject *__pyx_v_fixed_size); /* proto */
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_2c_positive_definite_inverse(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x); /* proto */
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_4c_multi_positive_definite_inverse(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k); /* proto */
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_6c_multi_positive_definite_inverse_size_4(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k); /* proto */
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_8c_crazy_operation(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k); /* proto */
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_10c_crazy_operation_size_4(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_int_0;
+static PyObject *__pyx_int_1;
+static PyObject *__pyx_int_2;
+static PyObject *__pyx_int_4;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
@@ -1298,10 +1355,527 @@ static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
-static PyObject *__pyx_codeobj__12;
+static PyObject *__pyx_tuple__12;
+static PyObject *__pyx_tuple__13;
+static PyObject *__pyx_tuple__14;
+static PyObject *__pyx_tuple__16;
+static PyObject *__pyx_tuple__18;
+static PyObject *__pyx_tuple__20;
+static PyObject *__pyx_tuple__22;
+static PyObject *__pyx_tuple__24;
+static PyObject *__pyx_codeobj__15;
+static PyObject *__pyx_codeobj__17;
+static PyObject *__pyx_codeobj__19;
+static PyObject *__pyx_codeobj__21;
+static PyObject *__pyx_codeobj__23;
+static PyObject *__pyx_codeobj__25;
 
-/* "eigen_example/eigen_example.pyx":17
- *             (Map[MatrixXd] &, Map[VectorXd] &)
+/* "eigen_example/eigen_example.pyx":34
+ * 
+ * 
+ * def _check_inputs(A, x, k = 1, fixed_size = False):             # <<<<<<<<<<<<<<
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_1_check_inputs(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_1_check_inputs = {"_check_inputs", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_1_check_inputs, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_1_check_inputs(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_A = 0;
+  PyObject *__pyx_v_x = 0;
+  PyObject *__pyx_v_k = 0;
+  PyObject *__pyx_v_fixed_size = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_check_inputs (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_x,&__pyx_n_s_k,&__pyx_n_s_fixed_size,0};
+    PyObject* values[4] = {0,0,0,0};
+    values[2] = ((PyObject *)__pyx_int_1);
+    values[3] = ((PyObject *)Py_False);
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_A)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("_check_inputs", 0, 2, 4, 1); __PYX_ERR(0, 34, __pyx_L3_error)
+        }
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_k);
+          if (value) { values[2] = value; kw_args--; }
+        }
+        case  3:
+        if (kw_args > 0) {
+          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_fixed_size);
+          if (value) { values[3] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_check_inputs") < 0)) __PYX_ERR(0, 34, __pyx_L3_error)
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_A = values[0];
+    __pyx_v_x = values[1];
+    __pyx_v_k = values[2];
+    __pyx_v_fixed_size = values[3];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("_check_inputs", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 34, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("eigen_example.eigen_example._check_inputs", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_13eigen_example_13eigen_example__check_inputs(__pyx_self, __pyx_v_A, __pyx_v_x, __pyx_v_k, __pyx_v_fixed_size);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13eigen_example_13eigen_example__check_inputs(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_A, PyObject *__pyx_v_x, PyObject *__pyx_v_k, PyObject *__pyx_v_fixed_size) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  __Pyx_RefNannySetupContext("_check_inputs", 0);
+
+  /* "eigen_example/eigen_example.pyx":35
+ * 
+ * def _check_inputs(A, x, k = 1, fixed_size = False):
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):             # <<<<<<<<<<<<<<
+ *         raise ValueError("A must be a square matrix")
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_int_2, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (!__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_5, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __pyx_t_4;
+  __pyx_L4_bool_binop_done:;
+  if (__pyx_t_1) {
+
+    /* "eigen_example/eigen_example.pyx":36
+ * def _check_inputs(A, x, k = 1, fixed_size = False):
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")             # <<<<<<<<<<<<<<
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
+ *         raise ValueError("A must be positive definite")
+ */
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __PYX_ERR(0, 36, __pyx_L1_error)
+
+    /* "eigen_example/eigen_example.pyx":35
+ * 
+ * def _check_inputs(A, x, k = 1, fixed_size = False):
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):             # <<<<<<<<<<<<<<
+ *         raise ValueError("A must be a square matrix")
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":37
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):             # <<<<<<<<<<<<<<
+ *         raise ValueError("A must be positive definite")
+ *     if(x.ndim != 1):
+ */
+  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_any); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_linalg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_eigvals); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_6))) {
+    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_6);
+    if (likely(__pyx_t_7)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
+      __Pyx_INCREF(__pyx_t_7);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_6, function);
+    }
+  }
+  if (!__pyx_t_7) {
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_A); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+  } else {
+    __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
+    __Pyx_INCREF(__pyx_v_A);
+    __Pyx_GIVEREF(__pyx_v_A);
+    PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_v_A);
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = PyObject_RichCompare(__pyx_t_5, __pyx_int_0, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (!__pyx_t_5) {
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else {
+    __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_5); __pyx_t_5 = NULL;
+    __Pyx_GIVEREF(__pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_6);
+    __pyx_t_6 = 0;
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__pyx_t_1) {
+
+    /* "eigen_example/eigen_example.pyx":38
+ *         raise ValueError("A must be a square matrix")
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
+ *         raise ValueError("A must be positive definite")             # <<<<<<<<<<<<<<
+ *     if(x.ndim != 1):
+ *         raise ValueError("x must be a vector")
+ */
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __PYX_ERR(0, 38, __pyx_L1_error)
+
+    /* "eigen_example/eigen_example.pyx":37
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):             # <<<<<<<<<<<<<<
+ *         raise ValueError("A must be positive definite")
+ *     if(x.ndim != 1):
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":39
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
+ *         raise ValueError("A must be positive definite")
+ *     if(x.ndim != 1):             # <<<<<<<<<<<<<<
+ *         raise ValueError("x must be a vector")
+ *     if(A.shape[0] != x.shape[0]):
+ */
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_ndim); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_int_1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_1) {
+
+    /* "eigen_example/eigen_example.pyx":40
+ *         raise ValueError("A must be positive definite")
+ *     if(x.ndim != 1):
+ *         raise ValueError("x must be a vector")             # <<<<<<<<<<<<<<
+ *     if(A.shape[0] != x.shape[0]):
+ *         raise ValueError("A and x are incompatible sizes")
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 40, __pyx_L1_error)
+
+    /* "eigen_example/eigen_example.pyx":39
+ *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
+ *         raise ValueError("A must be positive definite")
+ *     if(x.ndim != 1):             # <<<<<<<<<<<<<<
+ *         raise ValueError("x must be a vector")
+ *     if(A.shape[0] != x.shape[0]):
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":41
+ *     if(x.ndim != 1):
+ *         raise ValueError("x must be a vector")
+ *     if(A.shape[0] != x.shape[0]):             # <<<<<<<<<<<<<<
+ *         raise ValueError("A and x are incompatible sizes")
+ *     if(type(k) is not int):
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_8, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_1) {
+
+    /* "eigen_example/eigen_example.pyx":42
+ *         raise ValueError("x must be a vector")
+ *     if(A.shape[0] != x.shape[0]):
+ *         raise ValueError("A and x are incompatible sizes")             # <<<<<<<<<<<<<<
+ *     if(type(k) is not int):
+ *         raise TypeError("k must be an int")
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 42, __pyx_L1_error)
+
+    /* "eigen_example/eigen_example.pyx":41
+ *     if(x.ndim != 1):
+ *         raise ValueError("x must be a vector")
+ *     if(A.shape[0] != x.shape[0]):             # <<<<<<<<<<<<<<
+ *         raise ValueError("A and x are incompatible sizes")
+ *     if(type(k) is not int):
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":43
+ *     if(A.shape[0] != x.shape[0]):
+ *         raise ValueError("A and x are incompatible sizes")
+ *     if(type(k) is not int):             # <<<<<<<<<<<<<<
+ *         raise TypeError("k must be an int")
+ *     if(k < 0):
+ */
+  __pyx_t_1 = (((PyObject *)Py_TYPE(__pyx_v_k)) != ((PyObject *)(&PyInt_Type)));
+  __pyx_t_4 = (__pyx_t_1 != 0);
+  if (__pyx_t_4) {
+
+    /* "eigen_example/eigen_example.pyx":44
+ *         raise ValueError("A and x are incompatible sizes")
+ *     if(type(k) is not int):
+ *         raise TypeError("k must be an int")             # <<<<<<<<<<<<<<
+ *     if(k < 0):
+ *         raise ValueError("k must be nonnegative")
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 44, __pyx_L1_error)
+
+    /* "eigen_example/eigen_example.pyx":43
+ *     if(A.shape[0] != x.shape[0]):
+ *         raise ValueError("A and x are incompatible sizes")
+ *     if(type(k) is not int):             # <<<<<<<<<<<<<<
+ *         raise TypeError("k must be an int")
+ *     if(k < 0):
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":45
+ *     if(type(k) is not int):
+ *         raise TypeError("k must be an int")
+ *     if(k < 0):             # <<<<<<<<<<<<<<
+ *         raise ValueError("k must be nonnegative")
+ *     if(fixed_size):
+ */
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_k, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+
+    /* "eigen_example/eigen_example.pyx":46
+ *         raise TypeError("k must be an int")
+ *     if(k < 0):
+ *         raise ValueError("k must be nonnegative")             # <<<<<<<<<<<<<<
+ *     if(fixed_size):
+ *         if(x.shape[0] != 4):
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 46, __pyx_L1_error)
+
+    /* "eigen_example/eigen_example.pyx":45
+ *     if(type(k) is not int):
+ *         raise TypeError("k must be an int")
+ *     if(k < 0):             # <<<<<<<<<<<<<<
+ *         raise ValueError("k must be nonnegative")
+ *     if(fixed_size):
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":47
+ *     if(k < 0):
+ *         raise ValueError("k must be nonnegative")
+ *     if(fixed_size):             # <<<<<<<<<<<<<<
+ *         if(x.shape[0] != 4):
+ *             raise ValueError("x must be a vector of size 4")
+ */
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_fixed_size); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 47, __pyx_L1_error)
+  if (__pyx_t_4) {
+
+    /* "eigen_example/eigen_example.pyx":48
+ *         raise ValueError("k must be nonnegative")
+ *     if(fixed_size):
+ *         if(x.shape[0] != 4):             # <<<<<<<<<<<<<<
+ *             raise ValueError("x must be a vector of size 4")
+ *     return
+ */
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_8, __pyx_int_4, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 48, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (__pyx_t_4) {
+
+      /* "eigen_example/eigen_example.pyx":49
+ *     if(fixed_size):
+ *         if(x.shape[0] != 4):
+ *             raise ValueError("x must be a vector of size 4")             # <<<<<<<<<<<<<<
+ *     return
+ * 
+ */
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __PYX_ERR(0, 49, __pyx_L1_error)
+
+      /* "eigen_example/eigen_example.pyx":48
+ *         raise ValueError("k must be nonnegative")
+ *     if(fixed_size):
+ *         if(x.shape[0] != 4):             # <<<<<<<<<<<<<<
+ *             raise ValueError("x must be a vector of size 4")
+ *     return
+ */
+    }
+
+    /* "eigen_example/eigen_example.pyx":47
+ *     if(k < 0):
+ *         raise ValueError("k must be nonnegative")
+ *     if(fixed_size):             # <<<<<<<<<<<<<<
+ *         if(x.shape[0] != 4):
+ *             raise ValueError("x must be a vector of size 4")
+ */
+  }
+
+  /* "eigen_example/eigen_example.pyx":50
+ *         if(x.shape[0] != 4):
+ *             raise ValueError("x must be a vector of size 4")
+ *     return             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+
+  /* "eigen_example/eigen_example.pyx":34
+ * 
+ * 
+ * def _check_inputs(A, x, k = 1, fixed_size = False):             # <<<<<<<<<<<<<<
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_AddTraceback("eigen_example.eigen_example._check_inputs", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "eigen_example/eigen_example.pyx":53
+ * 
  * 
  * def c_positive_definite_inverse(np.ndarray A, np.ndarray x):             # <<<<<<<<<<<<<<
  *     """ Eigen Implementation of inverse """
@@ -1309,10 +1883,10 @@ static PyObject *__pyx_codeobj__12;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13eigen_example_13eigen_example_1c_positive_definite_inverse(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13eigen_example_13eigen_example_c_positive_definite_inverse[] = " Eigen Implementation of inverse ";
-static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_1c_positive_definite_inverse = {"c_positive_definite_inverse", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_1c_positive_definite_inverse, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13eigen_example_13eigen_example_c_positive_definite_inverse};
-static PyObject *__pyx_pw_13eigen_example_13eigen_example_1c_positive_definite_inverse(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_3c_positive_definite_inverse(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13eigen_example_13eigen_example_2c_positive_definite_inverse[] = " Eigen Implementation of inverse ";
+static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_3c_positive_definite_inverse = {"c_positive_definite_inverse", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_3c_positive_definite_inverse, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13eigen_example_13eigen_example_2c_positive_definite_inverse};
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_3c_positive_definite_inverse(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_A = 0;
   PyArrayObject *__pyx_v_x = 0;
   PyObject *__pyx_r = 0;
@@ -1338,11 +1912,11 @@ static PyObject *__pyx_pw_13eigen_example_13eigen_example_1c_positive_definite_i
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_positive_definite_inverse", 1, 2, 2, 1); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_positive_definite_inverse", 1, 2, 2, 1); __PYX_ERR(0, 53, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_positive_definite_inverse") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_positive_definite_inverse") < 0)) __PYX_ERR(0, 53, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1355,15 +1929,15 @@ static PyObject *__pyx_pw_13eigen_example_13eigen_example_1c_positive_definite_i
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("c_positive_definite_inverse", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("c_positive_definite_inverse", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 53, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("eigen_example.eigen_example.c_positive_definite_inverse", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_A), __pyx_ptype_5numpy_ndarray, 1, "A", 0))) __PYX_ERR(0, 17, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 17, __pyx_L1_error)
-  __pyx_r = __pyx_pf_13eigen_example_13eigen_example_c_positive_definite_inverse(__pyx_self, __pyx_v_A, __pyx_v_x);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_A), __pyx_ptype_5numpy_ndarray, 1, "A", 0))) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_r = __pyx_pf_13eigen_example_13eigen_example_2c_positive_definite_inverse(__pyx_self, __pyx_v_A, __pyx_v_x);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1374,227 +1948,59 @@ static PyObject *__pyx_pw_13eigen_example_13eigen_example_1c_positive_definite_i
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13eigen_example_13eigen_example_c_positive_definite_inverse(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x) {
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_2c_positive_definite_inverse(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x) {
   PyArrayObject *__pyx_v_bT = NULL;
   PyObject *__pyx_v_b = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  int __pyx_t_2;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
+  Py_ssize_t __pyx_t_4;
   PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  eigency::Map<Eigen::MatrixXd>  __pyx_t_9;
-  eigency::Map<Eigen::VectorXd>  __pyx_t_10;
+  eigency::Map<Eigen::MatrixXd>  __pyx_t_6;
+  eigency::Map<Eigen::VectorXd>  __pyx_t_7;
   __Pyx_RefNannySetupContext("c_positive_definite_inverse", 0);
 
-  /* "eigen_example/eigen_example.pyx":20
+  /* "eigen_example/eigen_example.pyx":56
  *     """ Eigen Implementation of inverse """
  *     # Check inputs
- *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):             # <<<<<<<<<<<<<<
- *         raise ValueError("A must be a square matrix")
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
- */
-  __pyx_t_2 = ((__pyx_v_A->nd != 2) != 0);
-  if (!__pyx_t_2) {
-  } else {
-    __pyx_t_1 = __pyx_t_2;
-    goto __pyx_L4_bool_binop_done;
-  }
-  __pyx_t_2 = (((__pyx_v_A->dimensions[0]) != (__pyx_v_A->dimensions[1])) != 0);
-  __pyx_t_1 = __pyx_t_2;
-  __pyx_L4_bool_binop_done:;
-  if (__pyx_t_1) {
-
-    /* "eigen_example/eigen_example.pyx":21
- *     # Check inputs
- *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
- *         raise ValueError("A must be a square matrix")             # <<<<<<<<<<<<<<
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
- *         raise ValueError("A must be positive definite")
- */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 21, __pyx_L1_error)
-
-    /* "eigen_example/eigen_example.pyx":20
- *     """ Eigen Implementation of inverse """
- *     # Check inputs
- *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):             # <<<<<<<<<<<<<<
- *         raise ValueError("A must be a square matrix")
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
- */
-  }
-
-  /* "eigen_example/eigen_example.pyx":22
- *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
- *         raise ValueError("A must be a square matrix")
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):             # <<<<<<<<<<<<<<
- *         raise ValueError("A must be positive definite")
- *     if(x.ndim != 1):
- */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_any); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_linalg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_eigvals); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = NULL;
-  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_6))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_6);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_6, function);
-    }
-  }
-  if (!__pyx_t_7) {
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_6, ((PyObject *)__pyx_v_A)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-  } else {
-    __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
-    __Pyx_INCREF(((PyObject *)__pyx_v_A));
-    __Pyx_GIVEREF(((PyObject *)__pyx_v_A));
-    PyTuple_SET_ITEM(__pyx_t_8, 0+1, ((PyObject *)__pyx_v_A));
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyObject_RichCompare(__pyx_t_4, __pyx_int_0, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = NULL;
-  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_5, function);
-    }
-  }
-  if (!__pyx_t_4) {
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_GOTREF(__pyx_t_3);
-  } else {
-    __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_4); __pyx_t_4 = NULL;
-    __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_6);
-    __pyx_t_6 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__pyx_t_1) {
-
-    /* "eigen_example/eigen_example.pyx":23
- *         raise ValueError("A must be a square matrix")
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
- *         raise ValueError("A must be positive definite")             # <<<<<<<<<<<<<<
- *     if(x.ndim != 1):
- *         raise ValueError("x must be a vector")
- */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 23, __pyx_L1_error)
-
-    /* "eigen_example/eigen_example.pyx":22
- *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
- *         raise ValueError("A must be a square matrix")
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):             # <<<<<<<<<<<<<<
- *         raise ValueError("A must be positive definite")
- *     if(x.ndim != 1):
- */
-  }
-
-  /* "eigen_example/eigen_example.pyx":24
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
- *         raise ValueError("A must be positive definite")
- *     if(x.ndim != 1):             # <<<<<<<<<<<<<<
- *         raise ValueError("x must be a vector")
- *     if(A.shape[0] != x.shape[0]):
- */
-  __pyx_t_1 = ((__pyx_v_x->nd != 1) != 0);
-  if (__pyx_t_1) {
-
-    /* "eigen_example/eigen_example.pyx":25
- *         raise ValueError("A must be positive definite")
- *     if(x.ndim != 1):
- *         raise ValueError("x must be a vector")             # <<<<<<<<<<<<<<
- *     if(A.shape[0] != x.shape[0]):
- *         raise ValueError("A and x are incompatible sizes")
- */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 25, __pyx_L1_error)
-
-    /* "eigen_example/eigen_example.pyx":24
- *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
- *         raise ValueError("A must be positive definite")
- *     if(x.ndim != 1):             # <<<<<<<<<<<<<<
- *         raise ValueError("x must be a vector")
- *     if(A.shape[0] != x.shape[0]):
- */
-  }
-
-  /* "eigen_example/eigen_example.pyx":26
- *     if(x.ndim != 1):
- *         raise ValueError("x must be a vector")
- *     if(A.shape[0] != x.shape[0]):             # <<<<<<<<<<<<<<
- *         raise ValueError("A and x are incompatible sizes")
- * 
- */
-  __pyx_t_1 = (((__pyx_v_A->dimensions[0]) != (__pyx_v_x->dimensions[0])) != 0);
-  if (__pyx_t_1) {
-
-    /* "eigen_example/eigen_example.pyx":27
- *         raise ValueError("x must be a vector")
- *     if(A.shape[0] != x.shape[0]):
- *         raise ValueError("A and x are incompatible sizes")             # <<<<<<<<<<<<<<
+ *     _check_inputs(A, x)             # <<<<<<<<<<<<<<
  * 
  *     bT = ndarray_copy(
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 27, __pyx_L1_error)
-
-    /* "eigen_example/eigen_example.pyx":26
- *     if(x.ndim != 1):
- *         raise ValueError("x must be a vector")
- *     if(A.shape[0] != x.shape[0]):             # <<<<<<<<<<<<<<
- *         raise ValueError("A and x are incompatible sizes")
- * 
- */
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_inputs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  __pyx_t_4 = 0;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __pyx_t_4 = 1;
+    }
   }
+  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__pyx_t_3) {
+    __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+  }
+  __Pyx_INCREF(((PyObject *)__pyx_v_A));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_A));
+  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_4, ((PyObject *)__pyx_v_A));
+  __Pyx_INCREF(((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_x));
+  PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, ((PyObject *)__pyx_v_x));
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "eigen_example/eigen_example.pyx":30
+  /* "eigen_example/eigen_example.pyx":59
  * 
  *     bT = ndarray_copy(
  *             _positive_definite_inverse(Map[MatrixXd](A), Map[VectorXd](x))             # <<<<<<<<<<<<<<
@@ -1602,43 +2008,903 @@ static PyObject *__pyx_pf_13eigen_example_13eigen_example_c_positive_definite_in
  *     b = bT.T # Eigen is column-major, python is row-major
  */
   try {
-    __pyx_t_9 = eigency::Map<Eigen::MatrixXd> (__pyx_v_A);
+    __pyx_t_6 = eigency::Map<Eigen::MatrixXd> (__pyx_v_A);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 30, __pyx_L1_error)
+    __PYX_ERR(0, 59, __pyx_L1_error)
   }
   try {
-    __pyx_t_10 = eigency::Map<Eigen::VectorXd> (__pyx_v_x);
+    __pyx_t_7 = eigency::Map<Eigen::VectorXd> (__pyx_v_x);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 30, __pyx_L1_error)
+    __PYX_ERR(0, 59, __pyx_L1_error)
   }
 
-  /* "eigen_example/eigen_example.pyx":29
- *         raise ValueError("A and x are incompatible sizes")
+  /* "eigen_example/eigen_example.pyx":58
+ *     _check_inputs(A, x)
  * 
  *     bT = ndarray_copy(             # <<<<<<<<<<<<<<
  *             _positive_definite_inverse(Map[MatrixXd](A), Map[VectorXd](x))
  *             )
  */
-  __pyx_t_3 = ((PyObject *)eigency::ndarray_copy(eigen_ex::positive_definite_inverse(__pyx_t_9, __pyx_t_10))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_v_bT = ((PyArrayObject *)__pyx_t_3);
-  __pyx_t_3 = 0;
+  __pyx_t_1 = ((PyObject *)eigency::ndarray_copy(eigen_ex::positive_definite_inverse(__pyx_t_6, __pyx_t_7))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_bT = ((PyArrayObject *)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "eigen_example/eigen_example.pyx":32
+  /* "eigen_example/eigen_example.pyx":61
  *             _positive_definite_inverse(Map[MatrixXd](A), Map[VectorXd](x))
  *             )
  *     b = bT.T # Eigen is column-major, python is row-major             # <<<<<<<<<<<<<<
  *     return b
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_bT), __pyx_n_s_T); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_v_b = __pyx_t_3;
-  __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_bT), __pyx_n_s_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_b = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "eigen_example/eigen_example.pyx":33
+  /* "eigen_example/eigen_example.pyx":62
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ *     return b             # <<<<<<<<<<<<<<
+ * 
+ * def c_multi_positive_definite_inverse(np.ndarray A, np.ndarray x, int k):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_b);
+  __pyx_r = __pyx_v_b;
+  goto __pyx_L0;
+
+  /* "eigen_example/eigen_example.pyx":53
+ * 
+ * 
+ * def c_positive_definite_inverse(np.ndarray A, np.ndarray x):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse """
+ *     # Check inputs
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_positive_definite_inverse", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_bT);
+  __Pyx_XDECREF(__pyx_v_b);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "eigen_example/eigen_example.pyx":64
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power"""
+ *     # Check inputs
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_5c_multi_positive_definite_inverse(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13eigen_example_13eigen_example_4c_multi_positive_definite_inverse[] = " Eigen Implementation of inverse to the k-th power";
+static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_5c_multi_positive_definite_inverse = {"c_multi_positive_definite_inverse", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_5c_multi_positive_definite_inverse, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13eigen_example_13eigen_example_4c_multi_positive_definite_inverse};
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_5c_multi_positive_definite_inverse(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyArrayObject *__pyx_v_A = 0;
+  PyArrayObject *__pyx_v_x = 0;
+  int __pyx_v_k;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("c_multi_positive_definite_inverse (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_x,&__pyx_n_s_k,0};
+    PyObject* values[3] = {0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_A)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_multi_positive_definite_inverse", 1, 3, 3, 1); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_multi_positive_definite_inverse", 1, 3, 3, 2); __PYX_ERR(0, 64, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_multi_positive_definite_inverse") < 0)) __PYX_ERR(0, 64, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+    }
+    __pyx_v_A = ((PyArrayObject *)values[0]);
+    __pyx_v_x = ((PyArrayObject *)values[1]);
+    __pyx_v_k = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("c_multi_positive_definite_inverse", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 64, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_multi_positive_definite_inverse", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_A), __pyx_ptype_5numpy_ndarray, 1, "A", 0))) __PYX_ERR(0, 64, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_r = __pyx_pf_13eigen_example_13eigen_example_4c_multi_positive_definite_inverse(__pyx_self, __pyx_v_A, __pyx_v_x, __pyx_v_k);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_4c_multi_positive_definite_inverse(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k) {
+  PyArrayObject *__pyx_v_bT = NULL;
+  PyObject *__pyx_v_b = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  Py_ssize_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  eigency::Map<Eigen::MatrixXd>  __pyx_t_7;
+  eigency::Map<Eigen::VectorXd>  __pyx_t_8;
+  __Pyx_RefNannySetupContext("c_multi_positive_definite_inverse", 0);
+
+  /* "eigen_example/eigen_example.pyx":67
+ *     """ Eigen Implementation of inverse to the k-th power"""
+ *     # Check inputs
+ *     _check_inputs(A, x, k)             # <<<<<<<<<<<<<<
+ * 
+ *     bT = ndarray_copy(
+ */
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_inputs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_k); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = NULL;
+  __pyx_t_5 = 0;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __pyx_t_5 = 1;
+    }
+  }
+  __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  if (__pyx_t_4) {
+    __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
+  }
+  __Pyx_INCREF(((PyObject *)__pyx_v_A));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_A));
+  PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_5, ((PyObject *)__pyx_v_A));
+  __Pyx_INCREF(((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_x));
+  PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, ((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_t_3);
+  __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":71
+ *     bT = ndarray_copy(
+ *             _multi_positive_definite_inverse(
+ *                 Map[MatrixXd](A), Map[VectorXd](x), k)             # <<<<<<<<<<<<<<
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ */
+  try {
+    __pyx_t_7 = eigency::Map<Eigen::MatrixXd> (__pyx_v_A);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 71, __pyx_L1_error)
+  }
+  try {
+    __pyx_t_8 = eigency::Map<Eigen::VectorXd> (__pyx_v_x);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 71, __pyx_L1_error)
+  }
+
+  /* "eigen_example/eigen_example.pyx":69
+ *     _check_inputs(A, x, k)
+ * 
+ *     bT = ndarray_copy(             # <<<<<<<<<<<<<<
+ *             _multi_positive_definite_inverse(
+ *                 Map[MatrixXd](A), Map[VectorXd](x), k)
+ */
+  __pyx_t_1 = ((PyObject *)eigency::ndarray_copy(eigen_ex::multi_positive_definite_inverse(__pyx_t_7, __pyx_t_8, __pyx_v_k))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_bT = ((PyArrayObject *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":73
+ *                 Map[MatrixXd](A), Map[VectorXd](x), k)
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major             # <<<<<<<<<<<<<<
+ *     return b
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_bT), __pyx_n_s_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_b = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":74
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ *     return b             # <<<<<<<<<<<<<<
+ * 
+ * def c_multi_positive_definite_inverse_size_4(np.ndarray A, np.ndarray x, int k):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_b);
+  __pyx_r = __pyx_v_b;
+  goto __pyx_L0;
+
+  /* "eigen_example/eigen_example.pyx":64
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power"""
+ *     # Check inputs
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_multi_positive_definite_inverse", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_bT);
+  __Pyx_XDECREF(__pyx_v_b);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "eigen_example/eigen_example.pyx":76
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power for dimension 4 """
+ *     # Check inputs
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_7c_multi_positive_definite_inverse_size_4(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13eigen_example_13eigen_example_6c_multi_positive_definite_inverse_size_4[] = " Eigen Implementation of inverse to the k-th power for dimension 4 ";
+static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_7c_multi_positive_definite_inverse_size_4 = {"c_multi_positive_definite_inverse_size_4", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_7c_multi_positive_definite_inverse_size_4, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13eigen_example_13eigen_example_6c_multi_positive_definite_inverse_size_4};
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_7c_multi_positive_definite_inverse_size_4(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyArrayObject *__pyx_v_A = 0;
+  PyArrayObject *__pyx_v_x = 0;
+  int __pyx_v_k;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("c_multi_positive_definite_inverse_size_4 (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_x,&__pyx_n_s_k,0};
+    PyObject* values[3] = {0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_A)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_multi_positive_definite_inverse_size_4", 1, 3, 3, 1); __PYX_ERR(0, 76, __pyx_L3_error)
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_multi_positive_definite_inverse_size_4", 1, 3, 3, 2); __PYX_ERR(0, 76, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_multi_positive_definite_inverse_size_4") < 0)) __PYX_ERR(0, 76, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+    }
+    __pyx_v_A = ((PyArrayObject *)values[0]);
+    __pyx_v_x = ((PyArrayObject *)values[1]);
+    __pyx_v_k = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 76, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("c_multi_positive_definite_inverse_size_4", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 76, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_multi_positive_definite_inverse_size_4", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_A), __pyx_ptype_5numpy_ndarray, 1, "A", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_r = __pyx_pf_13eigen_example_13eigen_example_6c_multi_positive_definite_inverse_size_4(__pyx_self, __pyx_v_A, __pyx_v_x, __pyx_v_k);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_6c_multi_positive_definite_inverse_size_4(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k) {
+  PyArrayObject *__pyx_v_bT = NULL;
+  PyObject *__pyx_v_b = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  eigency::Map<Eigen::Matrix4d>  __pyx_t_5;
+  eigency::Map<Eigen::Vector4d>  __pyx_t_6;
+  __Pyx_RefNannySetupContext("c_multi_positive_definite_inverse_size_4", 0);
+
+  /* "eigen_example/eigen_example.pyx":79
+ *     """ Eigen Implementation of inverse to the k-th power for dimension 4 """
+ *     # Check inputs
+ *     _check_inputs(A, x, k, fixed_size=True)             # <<<<<<<<<<<<<<
+ * 
+ *     bT = ndarray_copy(
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_inputs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_k); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_INCREF(((PyObject *)__pyx_v_A));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_A));
+  PyTuple_SET_ITEM(__pyx_t_3, 0, ((PyObject *)__pyx_v_A));
+  __Pyx_INCREF(((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_x));
+  PyTuple_SET_ITEM(__pyx_t_3, 1, ((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fixed_size, Py_True) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "eigen_example/eigen_example.pyx":83
+ *     bT = ndarray_copy(
+ *             _multi_positive_definite_inverse_size_4(
+ *                 Map[Matrix4d](A), Map[Vector4d](x), k)             # <<<<<<<<<<<<<<
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ */
+  try {
+    __pyx_t_5 = eigency::Map<Eigen::Matrix4d> (__pyx_v_A);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 83, __pyx_L1_error)
+  }
+  try {
+    __pyx_t_6 = eigency::Map<Eigen::Vector4d> (__pyx_v_x);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 83, __pyx_L1_error)
+  }
+
+  /* "eigen_example/eigen_example.pyx":81
+ *     _check_inputs(A, x, k, fixed_size=True)
+ * 
+ *     bT = ndarray_copy(             # <<<<<<<<<<<<<<
+ *             _multi_positive_definite_inverse_size_4(
+ *                 Map[Matrix4d](A), Map[Vector4d](x), k)
+ */
+  __pyx_t_4 = ((PyObject *)eigency::ndarray_copy(eigen_ex::multi_positive_definite_inverse_size_4(__pyx_t_5, __pyx_t_6, __pyx_v_k))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_v_bT = ((PyArrayObject *)__pyx_t_4);
+  __pyx_t_4 = 0;
+
+  /* "eigen_example/eigen_example.pyx":85
+ *                 Map[Matrix4d](A), Map[Vector4d](x), k)
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major             # <<<<<<<<<<<<<<
+ *     return b
+ * 
+ */
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_bT), __pyx_n_s_T); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_v_b = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "eigen_example/eigen_example.pyx":86
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ *     return b             # <<<<<<<<<<<<<<
+ * 
+ * def c_crazy_operation(np.ndarray A, np.ndarray x, int k):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_b);
+  __pyx_r = __pyx_v_b;
+  goto __pyx_L0;
+
+  /* "eigen_example/eigen_example.pyx":76
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power for dimension 4 """
+ *     # Check inputs
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_multi_positive_definite_inverse_size_4", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_bT);
+  __Pyx_XDECREF(__pyx_v_b);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "eigen_example/eigen_example.pyx":88
+ *     return b
+ * 
+ * def c_crazy_operation(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function"""
+ *     # Check inputs
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_9c_crazy_operation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13eigen_example_13eigen_example_8c_crazy_operation[] = " Eigen Implementation of crazy function";
+static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_9c_crazy_operation = {"c_crazy_operation", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_9c_crazy_operation, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13eigen_example_13eigen_example_8c_crazy_operation};
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_9c_crazy_operation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyArrayObject *__pyx_v_A = 0;
+  PyArrayObject *__pyx_v_x = 0;
+  int __pyx_v_k;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("c_crazy_operation (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_x,&__pyx_n_s_k,0};
+    PyObject* values[3] = {0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_A)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_crazy_operation", 1, 3, 3, 1); __PYX_ERR(0, 88, __pyx_L3_error)
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_crazy_operation", 1, 3, 3, 2); __PYX_ERR(0, 88, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_crazy_operation") < 0)) __PYX_ERR(0, 88, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+    }
+    __pyx_v_A = ((PyArrayObject *)values[0]);
+    __pyx_v_x = ((PyArrayObject *)values[1]);
+    __pyx_v_k = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("c_crazy_operation", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 88, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_crazy_operation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_A), __pyx_ptype_5numpy_ndarray, 1, "A", 0))) __PYX_ERR(0, 88, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_r = __pyx_pf_13eigen_example_13eigen_example_8c_crazy_operation(__pyx_self, __pyx_v_A, __pyx_v_x, __pyx_v_k);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_8c_crazy_operation(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k) {
+  PyArrayObject *__pyx_v_bT = NULL;
+  PyObject *__pyx_v_b = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  Py_ssize_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  eigency::Map<Eigen::MatrixXd>  __pyx_t_7;
+  eigency::Map<Eigen::VectorXd>  __pyx_t_8;
+  __Pyx_RefNannySetupContext("c_crazy_operation", 0);
+
+  /* "eigen_example/eigen_example.pyx":91
+ *     """ Eigen Implementation of crazy function"""
+ *     # Check inputs
+ *     _check_inputs(A, x, k)             # <<<<<<<<<<<<<<
+ * 
+ *     bT = ndarray_copy(
+ */
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_inputs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_k); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = NULL;
+  __pyx_t_5 = 0;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __pyx_t_5 = 1;
+    }
+  }
+  __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  if (__pyx_t_4) {
+    __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
+  }
+  __Pyx_INCREF(((PyObject *)__pyx_v_A));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_A));
+  PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_5, ((PyObject *)__pyx_v_A));
+  __Pyx_INCREF(((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_x));
+  PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, ((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_t_3);
+  __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":94
+ * 
+ *     bT = ndarray_copy(
+ *             _crazy_operation(Map[MatrixXd](A), Map[VectorXd](x), k)             # <<<<<<<<<<<<<<
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ */
+  try {
+    __pyx_t_7 = eigency::Map<Eigen::MatrixXd> (__pyx_v_A);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 94, __pyx_L1_error)
+  }
+  try {
+    __pyx_t_8 = eigency::Map<Eigen::VectorXd> (__pyx_v_x);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 94, __pyx_L1_error)
+  }
+
+  /* "eigen_example/eigen_example.pyx":93
+ *     _check_inputs(A, x, k)
+ * 
+ *     bT = ndarray_copy(             # <<<<<<<<<<<<<<
+ *             _crazy_operation(Map[MatrixXd](A), Map[VectorXd](x), k)
+ *             )
+ */
+  __pyx_t_1 = ((PyObject *)eigency::ndarray_copy(eigen_ex::crazy_operation(__pyx_t_7, __pyx_t_8, __pyx_v_k))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_bT = ((PyArrayObject *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":96
+ *             _crazy_operation(Map[MatrixXd](A), Map[VectorXd](x), k)
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major             # <<<<<<<<<<<<<<
+ *     return b
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_bT), __pyx_n_s_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_b = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":97
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ *     return b             # <<<<<<<<<<<<<<
+ * 
+ * def c_crazy_operation_size_4(np.ndarray A, np.ndarray x, int k):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_b);
+  __pyx_r = __pyx_v_b;
+  goto __pyx_L0;
+
+  /* "eigen_example/eigen_example.pyx":88
+ *     return b
+ * 
+ * def c_crazy_operation(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function"""
+ *     # Check inputs
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_crazy_operation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_bT);
+  __Pyx_XDECREF(__pyx_v_b);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "eigen_example/eigen_example.pyx":99
+ *     return b
+ * 
+ * def c_crazy_operation_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function for dimension 4 """
+ *     # Check inputs
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_11c_crazy_operation_size_4(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13eigen_example_13eigen_example_10c_crazy_operation_size_4[] = " Eigen Implementation of crazy function for dimension 4 ";
+static PyMethodDef __pyx_mdef_13eigen_example_13eigen_example_11c_crazy_operation_size_4 = {"c_crazy_operation_size_4", (PyCFunction)__pyx_pw_13eigen_example_13eigen_example_11c_crazy_operation_size_4, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13eigen_example_13eigen_example_10c_crazy_operation_size_4};
+static PyObject *__pyx_pw_13eigen_example_13eigen_example_11c_crazy_operation_size_4(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyArrayObject *__pyx_v_A = 0;
+  PyArrayObject *__pyx_v_x = 0;
+  int __pyx_v_k;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("c_crazy_operation_size_4 (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_A,&__pyx_n_s_x,&__pyx_n_s_k,0};
+    PyObject* values[3] = {0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_A)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_crazy_operation_size_4", 1, 3, 3, 1); __PYX_ERR(0, 99, __pyx_L3_error)
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_crazy_operation_size_4", 1, 3, 3, 2); __PYX_ERR(0, 99, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_crazy_operation_size_4") < 0)) __PYX_ERR(0, 99, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+    }
+    __pyx_v_A = ((PyArrayObject *)values[0]);
+    __pyx_v_x = ((PyArrayObject *)values[1]);
+    __pyx_v_k = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 99, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("c_crazy_operation_size_4", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 99, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_crazy_operation_size_4", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_A), __pyx_ptype_5numpy_ndarray, 1, "A", 0))) __PYX_ERR(0, 99, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_r = __pyx_pf_13eigen_example_13eigen_example_10c_crazy_operation_size_4(__pyx_self, __pyx_v_A, __pyx_v_x, __pyx_v_k);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13eigen_example_13eigen_example_10c_crazy_operation_size_4(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_A, PyArrayObject *__pyx_v_x, int __pyx_v_k) {
+  PyArrayObject *__pyx_v_bT = NULL;
+  PyObject *__pyx_v_b = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  eigency::Map<Eigen::Matrix4d>  __pyx_t_5;
+  eigency::Map<Eigen::Vector4d>  __pyx_t_6;
+  __Pyx_RefNannySetupContext("c_crazy_operation_size_4", 0);
+
+  /* "eigen_example/eigen_example.pyx":102
+ *     """ Eigen Implementation of crazy function for dimension 4 """
+ *     # Check inputs
+ *     _check_inputs(A, x, k, fixed_size=True)             # <<<<<<<<<<<<<<
+ * 
+ *     bT = ndarray_copy(
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_check_inputs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_k); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_INCREF(((PyObject *)__pyx_v_A));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_A));
+  PyTuple_SET_ITEM(__pyx_t_3, 0, ((PyObject *)__pyx_v_A));
+  __Pyx_INCREF(((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_x));
+  PyTuple_SET_ITEM(__pyx_t_3, 1, ((PyObject *)__pyx_v_x));
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fixed_size, Py_True) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "eigen_example/eigen_example.pyx":105
+ * 
+ *     bT = ndarray_copy(
+ *             _crazy_operation_size_4(Map[Matrix4d](A), Map[Vector4d](x), k)             # <<<<<<<<<<<<<<
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major
+ */
+  try {
+    __pyx_t_5 = eigency::Map<Eigen::Matrix4d> (__pyx_v_A);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 105, __pyx_L1_error)
+  }
+  try {
+    __pyx_t_6 = eigency::Map<Eigen::Vector4d> (__pyx_v_x);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(0, 105, __pyx_L1_error)
+  }
+
+  /* "eigen_example/eigen_example.pyx":104
+ *     _check_inputs(A, x, k, fixed_size=True)
+ * 
+ *     bT = ndarray_copy(             # <<<<<<<<<<<<<<
+ *             _crazy_operation_size_4(Map[Matrix4d](A), Map[Vector4d](x), k)
+ *             )
+ */
+  __pyx_t_4 = ((PyObject *)eigency::ndarray_copy(eigen_ex::crazy_operation_size_4(__pyx_t_5, __pyx_t_6, __pyx_v_k))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_v_bT = ((PyArrayObject *)__pyx_t_4);
+  __pyx_t_4 = 0;
+
+  /* "eigen_example/eigen_example.pyx":107
+ *             _crazy_operation_size_4(Map[Matrix4d](A), Map[Vector4d](x), k)
+ *             )
+ *     b = bT.T # Eigen is column-major, python is row-major             # <<<<<<<<<<<<<<
+ *     return b
+ * 
+ */
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_bT), __pyx_n_s_T); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_v_b = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "eigen_example/eigen_example.pyx":108
  *             )
  *     b = bT.T # Eigen is column-major, python is row-major
  *     return b             # <<<<<<<<<<<<<<
@@ -1650,23 +2916,21 @@ static PyObject *__pyx_pf_13eigen_example_13eigen_example_c_positive_definite_in
   __pyx_r = __pyx_v_b;
   goto __pyx_L0;
 
-  /* "eigen_example/eigen_example.pyx":17
- *             (Map[MatrixXd] &, Map[VectorXd] &)
+  /* "eigen_example/eigen_example.pyx":99
+ *     return b
  * 
- * def c_positive_definite_inverse(np.ndarray A, np.ndarray x):             # <<<<<<<<<<<<<<
- *     """ Eigen Implementation of inverse """
+ * def c_crazy_operation_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function for dimension 4 """
  *     # Check inputs
  */
 
   /* function exit code */
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("eigen_example.eigen_example.c_positive_definite_inverse", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("eigen_example.eigen_example.c_crazy_operation_size_4", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF((PyObject *)__pyx_v_bT);
@@ -1845,7 +3109,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 218, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -1901,7 +3165,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             info.buf = PyArray_DATA(self)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 222, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 222, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2210,7 +3474,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 259, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 259, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3025,7 +4289,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 799, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 799, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3093,7 +4357,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 803, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 803, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3202,7 +4466,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 823, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 823, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_Raise(__pyx_t_4, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3830,30 +5094,44 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_Non_native_byte_order_not_suppor, __pyx_k_Non_native_byte_order_not_suppor, sizeof(__pyx_k_Non_native_byte_order_not_suppor), 0, 1, 0, 0},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
   {&__pyx_n_s_T, __pyx_k_T, sizeof(__pyx_k_T), 0, 0, 1, 1},
+  {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_any, __pyx_k_any, sizeof(__pyx_k_any), 0, 0, 1, 1},
   {&__pyx_n_s_b, __pyx_k_b, sizeof(__pyx_k_b), 0, 0, 1, 1},
   {&__pyx_n_s_bT, __pyx_k_bT, sizeof(__pyx_k_bT), 0, 0, 1, 1},
+  {&__pyx_n_s_c_crazy_operation, __pyx_k_c_crazy_operation, sizeof(__pyx_k_c_crazy_operation), 0, 0, 1, 1},
+  {&__pyx_n_s_c_crazy_operation_size_4, __pyx_k_c_crazy_operation_size_4, sizeof(__pyx_k_c_crazy_operation_size_4), 0, 0, 1, 1},
+  {&__pyx_n_s_c_multi_positive_definite_invers, __pyx_k_c_multi_positive_definite_invers, sizeof(__pyx_k_c_multi_positive_definite_invers), 0, 0, 1, 1},
+  {&__pyx_n_s_c_multi_positive_definite_invers_2, __pyx_k_c_multi_positive_definite_invers_2, sizeof(__pyx_k_c_multi_positive_definite_invers_2), 0, 0, 1, 1},
   {&__pyx_n_s_c_positive_definite_inverse, __pyx_k_c_positive_definite_inverse, sizeof(__pyx_k_c_positive_definite_inverse), 0, 0, 1, 1},
+  {&__pyx_n_s_check_inputs, __pyx_k_check_inputs, sizeof(__pyx_k_check_inputs), 0, 0, 1, 1},
   {&__pyx_n_s_eigen_example_eigen_example, __pyx_k_eigen_example_eigen_example, sizeof(__pyx_k_eigen_example_eigen_example), 0, 0, 1, 1},
   {&__pyx_n_s_eigvals, __pyx_k_eigvals, sizeof(__pyx_k_eigvals), 0, 0, 1, 1},
+  {&__pyx_n_s_fixed_size, __pyx_k_fixed_size, sizeof(__pyx_k_fixed_size), 0, 0, 1, 1},
   {&__pyx_kp_s_home_aicherc_Projects_project_s, __pyx_k_home_aicherc_Projects_project_s, sizeof(__pyx_k_home_aicherc_Projects_project_s), 0, 0, 1, 0},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_k, __pyx_k_k, sizeof(__pyx_k_k), 0, 0, 1, 1},
+  {&__pyx_kp_s_k_must_be_an_int, __pyx_k_k_must_be_an_int, sizeof(__pyx_k_k_must_be_an_int), 0, 0, 1, 0},
+  {&__pyx_kp_s_k_must_be_nonnegative, __pyx_k_k_must_be_nonnegative, sizeof(__pyx_k_k_must_be_nonnegative), 0, 0, 1, 0},
   {&__pyx_n_s_linalg, __pyx_k_linalg, sizeof(__pyx_k_linalg), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
+  {&__pyx_n_s_ndim, __pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 0, 1, 1},
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
+  {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {&__pyx_n_s_x, __pyx_k_x, sizeof(__pyx_k_x), 0, 0, 1, 1},
   {&__pyx_kp_s_x_must_be_a_vector, __pyx_k_x_must_be_a_vector, sizeof(__pyx_k_x_must_be_a_vector), 0, 0, 1, 0},
+  {&__pyx_kp_s_x_must_be_a_vector_of_size_4, __pyx_k_x_must_be_a_vector_of_size_4, sizeof(__pyx_k_x_must_be_a_vector_of_size_4), 0, 0, 1, 0},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 44, __pyx_L1_error)
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 231, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 799, __pyx_L1_error)
   return 0;
@@ -3865,49 +5143,82 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "eigen_example/eigen_example.pyx":21
- *     # Check inputs
+  /* "eigen_example/eigen_example.pyx":36
+ * def _check_inputs(A, x, k = 1, fixed_size = False):
  *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
  *         raise ValueError("A must be a square matrix")             # <<<<<<<<<<<<<<
  *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
  *         raise ValueError("A must be positive definite")
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_A_must_be_a_square_matrix); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_A_must_be_a_square_matrix); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "eigen_example/eigen_example.pyx":23
+  /* "eigen_example/eigen_example.pyx":38
  *         raise ValueError("A must be a square matrix")
  *     if(_np.any(_np.linalg.eigvals(A) <= 0)):
  *         raise ValueError("A must be positive definite")             # <<<<<<<<<<<<<<
  *     if(x.ndim != 1):
  *         raise ValueError("x must be a vector")
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_A_must_be_positive_definite); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_A_must_be_positive_definite); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "eigen_example/eigen_example.pyx":25
+  /* "eigen_example/eigen_example.pyx":40
  *         raise ValueError("A must be positive definite")
  *     if(x.ndim != 1):
  *         raise ValueError("x must be a vector")             # <<<<<<<<<<<<<<
  *     if(A.shape[0] != x.shape[0]):
  *         raise ValueError("A and x are incompatible sizes")
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_x_must_be_a_vector); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_x_must_be_a_vector); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "eigen_example/eigen_example.pyx":27
+  /* "eigen_example/eigen_example.pyx":42
  *         raise ValueError("x must be a vector")
  *     if(A.shape[0] != x.shape[0]):
  *         raise ValueError("A and x are incompatible sizes")             # <<<<<<<<<<<<<<
- * 
- *     bT = ndarray_copy(
+ *     if(type(k) is not int):
+ *         raise TypeError("k must be an int")
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_A_and_x_are_incompatible_sizes); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_A_and_x_are_incompatible_sizes); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
+
+  /* "eigen_example/eigen_example.pyx":44
+ *         raise ValueError("A and x are incompatible sizes")
+ *     if(type(k) is not int):
+ *         raise TypeError("k must be an int")             # <<<<<<<<<<<<<<
+ *     if(k < 0):
+ *         raise ValueError("k must be nonnegative")
+ */
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_k_must_be_an_int); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__5);
+  __Pyx_GIVEREF(__pyx_tuple__5);
+
+  /* "eigen_example/eigen_example.pyx":46
+ *         raise TypeError("k must be an int")
+ *     if(k < 0):
+ *         raise ValueError("k must be nonnegative")             # <<<<<<<<<<<<<<
+ *     if(fixed_size):
+ *         if(x.shape[0] != 4):
+ */
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_k_must_be_nonnegative); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
+
+  /* "eigen_example/eigen_example.pyx":49
+ *     if(fixed_size):
+ *         if(x.shape[0] != 4):
+ *             raise ValueError("x must be a vector of size 4")             # <<<<<<<<<<<<<<
+ *     return
+ * 
+ */
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_x_must_be_a_vector_of_size_4); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
 
   /* "../../../anaconda2/envs/project-skeleton/lib/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":218
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
@@ -3916,9 +5227,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__5);
-  __Pyx_GIVEREF(__pyx_tuple__5);
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
 
   /* "../../../anaconda2/envs/project-skeleton/lib/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":222
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
@@ -3927,9 +5238,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             info.buf = PyArray_DATA(self)
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 222, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
 
   /* "../../../anaconda2/envs/project-skeleton/lib/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":259
  *                 if ((descr.byteorder == c'>' and little_endian) or
@@ -3938,9 +5249,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 259, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
 
   /* "../../../anaconda2/envs/project-skeleton/lib/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":799
  * 
@@ -3949,9 +5260,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 799, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(1, 799, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
 
   /* "../../../anaconda2/envs/project-skeleton/lib/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":803
  *         if ((child.byteorder == c'>' and little_endian) or
@@ -3960,9 +5271,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 803, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(1, 803, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
 
   /* "../../../anaconda2/envs/project-skeleton/lib/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":823
  *             t = child.type_num
@@ -3971,21 +5282,81 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 823, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(1, 823, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "eigen_example/eigen_example.pyx":17
- *             (Map[MatrixXd] &, Map[VectorXd] &)
+  /* "eigen_example/eigen_example.pyx":34
+ * 
+ * 
+ * def _check_inputs(A, x, k = 1, fixed_size = False):             # <<<<<<<<<<<<<<
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")
+ */
+  __pyx_tuple__14 = PyTuple_Pack(4, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_k, __pyx_n_s_fixed_size); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_check_inputs, 34, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 34, __pyx_L1_error)
+
+  /* "eigen_example/eigen_example.pyx":53
+ * 
  * 
  * def c_positive_definite_inverse(np.ndarray A, np.ndarray x):             # <<<<<<<<<<<<<<
  *     """ Eigen Implementation of inverse """
  *     # Check inputs
  */
-  __pyx_tuple__11 = PyTuple_Pack(4, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_bT, __pyx_n_s_b); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 17, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_c_positive_definite_inverse, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(4, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_bT, __pyx_n_s_b); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_c_positive_definite_inverse, 53, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 53, __pyx_L1_error)
+
+  /* "eigen_example/eigen_example.pyx":64
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power"""
+ *     # Check inputs
+ */
+  __pyx_tuple__18 = PyTuple_Pack(5, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_k, __pyx_n_s_bT, __pyx_n_s_b); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_c_multi_positive_definite_invers, 64, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 64, __pyx_L1_error)
+
+  /* "eigen_example/eigen_example.pyx":76
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power for dimension 4 """
+ *     # Check inputs
+ */
+  __pyx_tuple__20 = PyTuple_Pack(5, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_k, __pyx_n_s_bT, __pyx_n_s_b); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_c_multi_positive_definite_invers_2, 76, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 76, __pyx_L1_error)
+
+  /* "eigen_example/eigen_example.pyx":88
+ *     return b
+ * 
+ * def c_crazy_operation(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function"""
+ *     # Check inputs
+ */
+  __pyx_tuple__22 = PyTuple_Pack(5, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_k, __pyx_n_s_bT, __pyx_n_s_b); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_c_crazy_operation, 88, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 88, __pyx_L1_error)
+
+  /* "eigen_example/eigen_example.pyx":99
+ *     return b
+ * 
+ * def c_crazy_operation_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function for dimension 4 """
+ *     # Check inputs
+ */
+  __pyx_tuple__24 = PyTuple_Pack(5, __pyx_n_s_A, __pyx_n_s_x, __pyx_n_s_k, __pyx_n_s_bT, __pyx_n_s_b); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_aicherc_Projects_project_s, __pyx_n_s_c_crazy_operation_size_4, 99, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -3996,6 +5367,9 @@ static int __Pyx_InitCachedConstants(void) {
 static int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_2 = PyInt_FromLong(2); if (unlikely(!__pyx_int_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_4 = PyInt_FromLong(4); if (unlikely(!__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -4117,16 +5491,76 @@ PyMODINIT_FUNC PyInit_eigen_example(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "eigen_example/eigen_example.pyx":17
- *             (Map[MatrixXd] &, Map[VectorXd] &)
+  /* "eigen_example/eigen_example.pyx":34
+ * 
+ * 
+ * def _check_inputs(A, x, k = 1, fixed_size = False):             # <<<<<<<<<<<<<<
+ *     if(A.ndim != 2 or A.shape[0] != A.shape[1]):
+ *         raise ValueError("A must be a square matrix")
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_1_check_inputs, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_inputs, __pyx_t_1) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":53
+ * 
  * 
  * def c_positive_definite_inverse(np.ndarray A, np.ndarray x):             # <<<<<<<<<<<<<<
  *     """ Eigen Implementation of inverse """
  *     # Check inputs
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_1c_positive_definite_inverse, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_3c_positive_definite_inverse, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_positive_definite_inverse, __pyx_t_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_positive_definite_inverse, __pyx_t_1) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":64
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power"""
+ *     # Check inputs
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_5c_multi_positive_definite_inverse, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_multi_positive_definite_invers, __pyx_t_1) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":76
+ *     return b
+ * 
+ * def c_multi_positive_definite_inverse_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of inverse to the k-th power for dimension 4 """
+ *     # Check inputs
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_7c_multi_positive_definite_inverse_size_4, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_multi_positive_definite_invers_2, __pyx_t_1) < 0) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":88
+ *     return b
+ * 
+ * def c_crazy_operation(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function"""
+ *     # Check inputs
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_9c_crazy_operation, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_crazy_operation, __pyx_t_1) < 0) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "eigen_example/eigen_example.pyx":99
+ *     return b
+ * 
+ * def c_crazy_operation_size_4(np.ndarray A, np.ndarray x, int k):             # <<<<<<<<<<<<<<
+ *     """ Eigen Implementation of crazy function for dimension 4 """
+ *     # Check inputs
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13eigen_example_13eigen_example_11c_crazy_operation_size_4, NULL, __pyx_n_s_eigen_example_eigen_example); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_crazy_operation_size_4, __pyx_t_1) < 0) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "eigen_example/eigen_example.pyx":1
@@ -4343,31 +5777,85 @@ bad:
     return -1;
 }
 
-/* ArgTypeTest */
-static void __Pyx_RaiseArgumentTypeInvalid(const char* name, PyObject *obj, PyTypeObject *type) {
-    PyErr_Format(PyExc_TypeError,
-        "Argument '%.200s' has incorrect type (expected %.200s, got %.200s)",
-        name, type->tp_name, Py_TYPE(obj)->tp_name);
+/* GetItemInt */
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
+    PyObject *r;
+    if (!j) return NULL;
+    r = PyObject_GetItem(o, j);
+    Py_DECREF(j);
+    return r;
 }
-static CYTHON_INLINE int __Pyx_ArgTypeTest(PyObject *obj, PyTypeObject *type, int none_allowed,
-    const char *name, int exact)
-{
-    if (unlikely(!type)) {
-        PyErr_SetString(PyExc_SystemError, "Missing type object");
-        return 0;
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (wraparound & unlikely(i < 0)) i += PyList_GET_SIZE(o);
+    if ((!boundscheck) || likely((0 <= i) & (i < PyList_GET_SIZE(o)))) {
+        PyObject *r = PyList_GET_ITEM(o, i);
+        Py_INCREF(r);
+        return r;
     }
-    if (none_allowed && obj == Py_None) return 1;
-    else if (exact) {
-        if (likely(Py_TYPE(obj) == type)) return 1;
-        #if PY_MAJOR_VERSION == 2
-        else if ((type == &PyBaseString_Type) && likely(__Pyx_PyBaseString_CheckExact(obj))) return 1;
-        #endif
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (wraparound & unlikely(i < 0)) i += PyTuple_GET_SIZE(o);
+    if ((!boundscheck) || likely((0 <= i) & (i < PyTuple_GET_SIZE(o)))) {
+        PyObject *r = PyTuple_GET_ITEM(o, i);
+        Py_INCREF(r);
+        return r;
     }
-    else {
-        if (likely(PyObject_TypeCheck(obj, type))) return 1;
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
+                                                     CYTHON_NCP_UNUSED int wraparound,
+                                                     CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (is_list || PyList_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
+        if ((!boundscheck) || (likely((n >= 0) & (n < PyList_GET_SIZE(o))))) {
+            PyObject *r = PyList_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
     }
-    __Pyx_RaiseArgumentTypeInvalid(name, obj, type);
-    return 0;
+    else if (PyTuple_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
+        if ((!boundscheck) || likely((n >= 0) & (n < PyTuple_GET_SIZE(o)))) {
+            PyObject *r = PyTuple_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    } else {
+        PySequenceMethods *m = Py_TYPE(o)->tp_as_sequence;
+        if (likely(m && m->sq_item)) {
+            if (wraparound && unlikely(i < 0) && likely(m->sq_length)) {
+                Py_ssize_t l = m->sq_length(o);
+                if (likely(l >= 0)) {
+                    i += l;
+                } else {
+                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
+                        return NULL;
+                    PyErr_Clear();
+                }
+            }
+            return m->sq_item(o, i);
+        }
+    }
+#else
+    if (is_list || PySequence_Check(o)) {
+        return PySequence_GetItem(o, i);
+    }
+#endif
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
 }
 
 /* PyObjectCall */
@@ -4650,6 +6138,33 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
 }
 #endif
 
+/* ArgTypeTest */
+      static void __Pyx_RaiseArgumentTypeInvalid(const char* name, PyObject *obj, PyTypeObject *type) {
+    PyErr_Format(PyExc_TypeError,
+        "Argument '%.200s' has incorrect type (expected %.200s, got %.200s)",
+        name, type->tp_name, Py_TYPE(obj)->tp_name);
+}
+static CYTHON_INLINE int __Pyx_ArgTypeTest(PyObject *obj, PyTypeObject *type, int none_allowed,
+    const char *name, int exact)
+{
+    if (unlikely(!type)) {
+        PyErr_SetString(PyExc_SystemError, "Missing type object");
+        return 0;
+    }
+    if (none_allowed && obj == Py_None) return 1;
+    else if (exact) {
+        if (likely(Py_TYPE(obj) == type)) return 1;
+        #if PY_MAJOR_VERSION == 2
+        else if ((type == &PyBaseString_Type) && likely(__Pyx_PyBaseString_CheckExact(obj))) return 1;
+        #endif
+    }
+    else {
+        if (likely(PyObject_TypeCheck(obj, type))) return 1;
+    }
+    __Pyx_RaiseArgumentTypeInvalid(name, obj, type);
+    return 0;
+}
+
 /* RaiseTooManyValuesToUnpack */
       static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
     PyErr_Format(PyExc_ValueError,
@@ -4916,6 +6431,82 @@ bad:
     Py_XDECREF(py_frame);
 }
 
+/* CIntFromPyVerify */
+      #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
+#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
+    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
+#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
+    {\
+        func_type value = func_value;\
+        if (sizeof(target_type) < sizeof(func_type)) {\
+            if (unlikely(value != (func_type) (target_type) value)) {\
+                func_type zero = 0;\
+                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
+                    return (target_type) -1;\
+                if (is_unsigned && unlikely(value < zero))\
+                    goto raise_neg_overflow;\
+                else\
+                    goto raise_overflow;\
+            }\
+        }\
+        return (target_type) value;\
+    }
+
+/* CIntToPy */
+      static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+    const long neg_one = (long) -1, const_zero = (long) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(long) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(long) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+        }
+    } else {
+        if (sizeof(long) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(long),
+                                     little, !is_unsigned);
+    }
+}
+
+/* CIntToPy */
+      static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
+    const int neg_one = (int) -1, const_zero = (int) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(int) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+        }
+    } else {
+        if (sizeof(int) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(int),
+                                     little, !is_unsigned);
+    }
+}
+
 /* None */
       #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
@@ -5161,55 +6752,6 @@ bad:
 #endif
 
 /* CIntToPy */
-      static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
-    const int neg_one = (int) -1, const_zero = (int) 0;
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(int) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(int) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-        }
-    } else {
-        if (sizeof(int) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-        }
-    }
-    {
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&value;
-        return _PyLong_FromByteArray(bytes, sizeof(int),
-                                     little, !is_unsigned);
-    }
-}
-
-/* CIntFromPyVerify */
-      #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
-#define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
-    __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
-#define __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, exc)\
-    {\
-        func_type value = func_value;\
-        if (sizeof(target_type) < sizeof(func_type)) {\
-            if (unlikely(value != (func_type) (target_type) value)) {\
-                func_type zero = 0;\
-                if (exc && unlikely(value == (func_type)-1 && PyErr_Occurred()))\
-                    return (target_type) -1;\
-                if (is_unsigned && unlikely(value < zero))\
-                    goto raise_neg_overflow;\
-                else\
-                    goto raise_overflow;\
-            }\
-        }\
-        return (target_type) value;\
-    }
-
-/* CIntToPy */
       static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum__NPY_TYPES(enum NPY_TYPES value) {
     const enum NPY_TYPES neg_one = (enum NPY_TYPES) -1, const_zero = (enum NPY_TYPES) 0;
     const int is_unsigned = neg_one > const_zero;
@@ -5419,33 +6961,6 @@ raise_neg_overflow:
     PyErr_SetString(PyExc_OverflowError,
         "can't convert negative value to int");
     return (int) -1;
-}
-
-/* CIntToPy */
-      static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
-    const long neg_one = (long) -1, const_zero = (long) 0;
-    const int is_unsigned = neg_one > const_zero;
-    if (is_unsigned) {
-        if (sizeof(long) < sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(long) <= sizeof(unsigned long)) {
-            return PyLong_FromUnsignedLong((unsigned long) value);
-        } else if (sizeof(long) <= sizeof(unsigned PY_LONG_LONG)) {
-            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
-        }
-    } else {
-        if (sizeof(long) <= sizeof(long)) {
-            return PyInt_FromLong((long) value);
-        } else if (sizeof(long) <= sizeof(PY_LONG_LONG)) {
-            return PyLong_FromLongLong((PY_LONG_LONG) value);
-        }
-    }
-    {
-        int one = 1; int little = (int)*(unsigned char *)&one;
-        unsigned char *bytes = (unsigned char *)&value;
-        return _PyLong_FromByteArray(bytes, sizeof(long),
-                                     little, !is_unsigned);
-    }
 }
 
 /* CIntFromPy */
